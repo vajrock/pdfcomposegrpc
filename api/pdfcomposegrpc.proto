@@ -1,0 +1,21 @@
+syntax = "proto3";
+option go_package="pdfcomposegrpc";
+package pdfcomposegrpc;
+
+
+
+message ImageList {
+    repeated File list =1;
+}
+
+message File {
+    bytes chunk = 1;
+}
+
+message PDFResponse {
+    bytes chunk = 1;
+}
+
+service PDFComposer {
+    rpc send(stream ImageList) returns(PDFResponse);
+}
