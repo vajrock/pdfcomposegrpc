@@ -1,5 +1,5 @@
 #!/bin/sh
 
-projectDir=$(dirname $(pwd))
-echo $projectDir
-protoc  $projectDir/api/*.proto --proto_path=$projectDir --go-grpc_out=$projectDir --go_out=$projectDir
+
+
+protoc --go_out=../ --go_opt=paths=source_relative --go-grpc_out=../ --go-grpc_opt=paths=source_relative -I ../api ../api/*.proto

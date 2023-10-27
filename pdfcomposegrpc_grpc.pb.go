@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v3.12.4
-// source: api/pdfcomposegrpc.proto
+// source: pdfcomposegrpc.proto
 
-package ___
+package pdfcomposegrpc
 
 import (
 	context "context"
@@ -139,5 +139,5 @@ var PDFComposer_ServiceDesc = grpc.ServiceDesc{
 			ClientStreams: true,
 		},
 	},
-	Metadata: "api/pdfcomposegrpc.proto",
+	Metadata: "pdfcomposegrpc.proto",
 }

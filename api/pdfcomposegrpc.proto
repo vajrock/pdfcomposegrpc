@@ -1,5 +1,5 @@
 syntax = "proto3";
-option go_package="pdfcomposegrpc";
+option go_package="github.com/vajrock/pdfcomposegrpc";
 package pdfcomposegrpc;
 
 
