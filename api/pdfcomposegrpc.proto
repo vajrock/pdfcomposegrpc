@@ -18,5 +18,5 @@ message PDFResponse {
 }
 
 service PDFComposer {
-    rpc send(stream ImageList) returns(PDFResponse);
+    rpc ConverToPdf(stream ImageList) returns(PDFResponse);
 }
