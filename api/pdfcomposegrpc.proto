@@ -13,7 +13,8 @@ message File {
 }
 
 message PDFResponse {
-    bytes chunk = 1;
+    bool Success = 1;
+    bytes chunk = 2;
 }
 
 service PDFComposer {
