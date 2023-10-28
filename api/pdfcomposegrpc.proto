@@ -2,7 +2,9 @@ syntax = "proto3";
 option go_package="github.com/vajrock/pdfcomposegrpc";
 package pdfcomposegrpc;
 
-
+service PDFComposer {
+    rpc ConverToPdf(ImageList) returns(PDFResponse) {}
+}
 
 message ImageList {
     repeated File list =1;
@@ -17,6 +19,3 @@ message PDFResponse {
     bytes chunk = 2;
 }
 
-service PDFComposer {
-    rpc ConverToPdf(stream ImageList) returns(PDFResponse) {}
-}
