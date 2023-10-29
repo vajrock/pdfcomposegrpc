@@ -7,7 +7,7 @@ service PDFComposer {
 }
 
 message ImageList {
-    repeated File list =1;
+    repeated File list = 1;
 }
 
 message File {
@@ -15,7 +15,6 @@ message File {
 }
 
 message PDFResponse {
-    bool Success = 1;
-    bytes chunk = 2;
+    bytes chunk = 1;
 }
 
