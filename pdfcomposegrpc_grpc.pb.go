@@ -26,7 +26,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PDFComposerClient interface {
-	ConverToPdf(ctx context.Context, in *ImageList, opts ...grpc.CallOption) (*PDFResponse, error)
+	ConverToPdf(ctx context.Context, in *ImageList, opts ...grpc.CallOption) (PDFComposer_ConverToPdfClient, error)
 }
 
 type pDFComposerClient struct {
@@ -37,20 +37,43 @@ func NewPDFComposerClient(cc grpc.ClientConnInterface) PDFComposerClient {
 	return &pDFComposerClient{cc}
 }
 
-func (c *pDFComposerClient) ConverToPdf(ctx context.Context, in *ImageList, opts ...grpc.CallOption) (*PDFResponse, error) {
-	out := new(PDFResponse)
-	err := c.cc.Invoke(ctx, PDFComposer_ConverToPdf_FullMethodName, in, out, opts...)
+func (c *pDFComposerClient) ConverToPdf(ctx context.Context, in *ImageList, opts ...grpc.CallOption) (PDFComposer_ConverToPdfClient, error) {
+	stream, err := c.cc.NewStream(ctx, &PDFComposer_ServiceDesc.Streams[0], PDFComposer_ConverToPdf_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &pDFComposerConverToPdfClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type PDFComposer_ConverToPdfClient interface {
+	Recv() (*PDFResponse, error)
+	grpc.ClientStream
+}
+
+type pDFComposerConverToPdfClient struct {
+	grpc.ClientStream
+}
+
+func (x *pDFComposerConverToPdfClient) Recv() (*PDFResponse, error) {
+	m := new(PDFResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 // PDFComposerServer is the server API for PDFComposer service.
 // All implementations must embed UnimplementedPDFComposerServer
 // for forward compatibility
 type PDFComposerServer interface {
-	ConverToPdf(context.Context, *ImageList) (*PDFResponse, error)
+	ConverToPdf(*ImageList, PDFComposer_ConverToPdfServer) error
 	mustEmbedUnimplementedPDFComposerServer()
 }
 
@@ -58,8 +81,8 @@ type PDFComposerServer interface {
 type UnimplementedPDFComposerServer struct {
 }
 
-func (UnimplementedPDFComposerServer) ConverToPdf(context.Context, *ImageList) (*PDFResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ConverToPdf not implemented")
+func (UnimplementedPDFComposerServer) ConverToPdf(*ImageList, PDFComposer_ConverToPdfServer) error {
+	return status.Errorf(codes.Unimplemented, "method ConverToPdf not implemented")
 }
 func (UnimplementedPDFComposerServer) mustEmbedUnimplementedPDFComposerServer() {}
 
@@ -74,22 +97,25 @@ func RegisterPDFComposerServer(s grpc.ServiceRegistrar, srv PDFComposerServer) {
 	s.RegisterService(&PDFComposer_ServiceDesc, srv)
 }
 
-func _PDFComposer_ConverToPdf_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ImageList)
-	if err := dec(in); err != nil {
-		return nil, err
+func _PDFComposer_ConverToPdf_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ImageList)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	if interceptor == nil {
-		return srv.(PDFComposerServer).ConverToPdf(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PDFComposer_ConverToPdf_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PDFComposerServer).ConverToPdf(ctx, req.(*ImageList))
-	}
-	return interceptor(ctx, in, info, handler)
+	return srv.(PDFComposerServer).ConverToPdf(m, &pDFComposerConverToPdfServer{stream})
+}
+
+type PDFComposer_ConverToPdfServer interface {
+	Send(*PDFResponse) error
+	grpc.ServerStream
+}
+
+type pDFComposerConverToPdfServer struct {
+	grpc.ServerStream
+}
+
+func (x *pDFComposerConverToPdfServer) Send(m *PDFResponse) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 // PDFComposer_ServiceDesc is the grpc.ServiceDesc for PDFComposer service.
@@ -98,12 +124,13 @@ func _PDFComposer_ConverToPdf_Handler(srv interface{}, ctx context.Context, dec 
 var PDFComposer_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "pdfcomposegrpc.PDFComposer",
 	HandlerType: (*PDFComposerServer)(nil),
-	Methods: []grpc.MethodDesc{
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
 		{
-			MethodName: "ConverToPdf",
-			Handler:    _PDFComposer_ConverToPdf_Handler,
+			StreamName:    "ConverToPdf",
+			Handler:       _PDFComposer_ConverToPdf_Handler,
+			ServerStreams: true,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
 	Metadata: "pdfcomposegrpc.proto",
 }
