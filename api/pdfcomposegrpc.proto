@@ -3,7 +3,7 @@ option go_package="github.com/vajrock/pdfcomposegrpc";
 package pdfcomposegrpc;
 
 service PDFComposer {
-    rpc ConverToPdf(ImageList) returns(stream PDFResponse) {}
+    rpc ConverToPdf(stream ImageList) returns(stream PDFResponse) {}
 }
 
 message ImageList {
